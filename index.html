@@ -774,7 +774,7 @@ function renderFoodModal(totalHp) {
     
     grid.innerHTML += `
       <div class="food-card">
-        <img src="${food.img}" alt="${food.name}" class="food-img" onerror="this.src='images/icon.webp'">
+        <img src="${food.img}" alt="${food.name}" class="food-img">
         <div class="food-name">${food.name}</div>
         <div class="food-qty">${fmtNum(requiredQty)}</div>
       </div>
