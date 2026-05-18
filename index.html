@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Slime Rarity Calculator</title>
 <!-- Підключення іконки (favicon) -->
-<link rel="icon" type="image/png" href="images/icon.webp">
+<link rel="icon" type="image/png" href="others/icon.webp">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -19,10 +19,7 @@
   .header-left { display: flex; align-items: center; gap: 12px; }
   .header-right { display: flex; align-items: center; gap: 10px; }
   .title { font-size: 26px; font-weight: 700; color: #f0f0ff; letter-spacing: -0.3px; }
-  .beta-badge {
-    font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 999px;
-    border: 1.5px solid #5a50a0; color: #a090e0; letter-spacing: 0.08em; text-transform: uppercase;
-  }
+  
   .reset-btn {
     font-size: 13px; font-weight: 500; padding: 7px 20px; border-radius: 999px;
     border: 1.5px solid #4a4070; background: transparent; color: #b0a8e0;
@@ -109,7 +106,7 @@
 
   .shiny-overlay {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    background-image: url('images/shiny.png'); background-size: cover; background-position: center;
+    background-image: url('others/shiny.png'); background-size: cover; background-position: center;
     pointer-events: none; z-index: 5; opacity: 0.9; display: none;
   }
   
@@ -203,9 +200,15 @@
   .result-box { background: #1a1828; border: 1.5px solid #2a2540; border-radius: 14px; padding: 1.5rem 1.75rem; margin-top: 1.25rem; position: relative; }
   .result-stats { display: flex; gap: 2.5rem; flex-wrap: wrap; margin-bottom: 1.25rem; align-items: center; }
   .stat-label { font-size: 11px; font-weight: 700; color: #5a5580; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.08em; }
-  .stat-value { font-size: 16px; font-weight: 600; color: #e8e8f0; margin: 0; }
+  .stat-value { font-size: 16px; font-weight: 600; color: #e8e8f0; margin: 0; display: flex; align-items: center; gap: 8px;}
   .divider { border: none; border-top: 1px solid #2a2540; margin: 0 0 1.25rem; }
   .final-label { font-size: 11px; font-weight: 700; color: #5a5580; margin: 0; text-transform: uppercase; letter-spacing: 0.08em; }
+
+  .food-trigger-btn {
+    background: #2a2540; border: none; color: #e8e8f0; font-size: 13px; font-weight: 700;
+    padding: 3px 8px; border-radius: 6px; cursor: pointer; transition: 0.2s;
+  }
+  .food-trigger-btn:hover { background: #4a4070; color: #fff; }
   
   /* ОБВОДКА ГОЛОВНОГО ШАНСУ */
   #rarity-value { 
@@ -231,7 +234,7 @@
   .combo-sub { font-size: 11px; color: #5a5580; margin: 0 0 3px; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
   .combo-name-text { font-size: 14px; font-weight: 600; margin: 0; color: #c0b8e8; }
 
-  /* === FAQ MODAL === */
+  /* === MODAL STYLES === */
   .modal-overlay {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(0, 0, 0, 0.7); z-index: 100;
@@ -254,10 +257,23 @@
     border-radius: 8px; transition: 0.2s;
   }
   .modal-close:hover { background: #2a2540; color: #e8e8f0; }
+  
   .faq-list { display: flex; flex-direction: column; gap: 1.25rem; margin-top: 1.5rem; }
   .faq-item { background: #13121a; padding: 1.25rem; border-radius: 10px; border: 1px solid #2a2540; }
   .faq-q { font-weight: 700; color: #d0c8f0; margin-bottom: 0.5rem; font-size: 15px; }
   .faq-a { color: #a0a0c0; font-size: 14px; line-height: 1.6; }
+
+  /* === FOOD MODAL GRID === */
+  .food-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; margin-top: 1.5rem;
+  }
+  .food-card {
+    background: #13121a; border: 1px solid #3a3560; border-radius: 12px; padding: 12px;
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+  }
+  .food-img { width: 48px; height: 48px; object-fit: contain; margin-bottom: 8px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));}
+  .food-name { font-size: 12px; font-weight: 600; color: #c0b8e8; margin-bottom: 4px; }
+  .food-qty { font-size: 16px; font-weight: 800; color: #a6ff8b; }
 </style>
 </head>
 <body>
@@ -297,9 +313,15 @@
       <div><p class="stat-label">Base Rarity</p><p class="stat-value" id="base-rarity">—</p></div>
       <div><p class="stat-label">Mutations</p><p class="stat-value" id="active-label">None</p></div>
       
-      <div style="margin-left: auto; display: flex; flex-direction: column; gap: 4px;">
-        <p class="stat-label">Level</p>
-        <input type="number" id="level-num" class="level-input" min="1" max="9999" value="1" oninput="syncLevel()">
+      <div style="margin-left: auto; display: flex; gap: 2.5rem; align-items: center; flex-wrap: wrap;">
+        <div>
+          <p class="stat-label">Total Exp</p>
+          <p class="stat-value" id="upgrade-cost">—</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 4px;">
+          <p class="stat-label">Level</p>
+          <input type="number" id="level-num" class="level-input" min="1" max="9999" value="1" oninput="syncLevel()">
+        </div>
       </div>
       
     </div>
@@ -331,7 +353,7 @@
 </div>
 
 <!-- FAQ Modal -->
-<div class="modal-overlay" id="faq-modal" onclick="closeFaq(event)">
+<div class="modal-overlay" id="faq-modal" onclick="closeModal(event, 'faq-modal')">
   <div class="modal-content" onclick="event.stopPropagation()">
     <button class="modal-close" onclick="toggleFaq()">✕</button>
     <h2 class="title" style="font-size: 22px;">FAQ & Guide</h2>
@@ -349,96 +371,97 @@
         <div class="faq-q">Why can't I select some mutations together?</div>
         <div class="faq-a">Certain mutations are mutually exclusive and cannot exist on the same slime at once. For example, a slime cannot be both <b>Big</b> and <b>Huge</b> simultaneously.</div>
       </div>
-      <div class="faq-item">
-        <div class="faq-q">How are the stats calculated?</div>
-        <div class="faq-a">Stats scale continuously with the slime's level modifier and mutation multipliers. The base stats are scaled by your slime's level up to Lv. 9999. The stat multiplier depends on your specific combination of mutations.</div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-q">How do I save my Favorite slimes?</div>
-        <div class="faq-a">Once you configure your slime, level, and mutations, click the <b>"☆ Save"</b> button. It will be stored in your browser locally. You can easily click any saved slime to instantly load its configuration, or simply drag and drop them to reorder your Favorites list.</div>
-      </div>
     </div>
+  </div>
+</div>
+
+<!-- Food Requirements Modal -->
+<div class="modal-overlay" id="food-modal" onclick="closeModal(event, 'food-modal')">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="toggleFoodModal()">✕</button>
+    <h2 class="title" id="food-modal-title" style="font-size: 22px;">Food Needed 🍔</h2>
+    <div id="food-grid" class="food-grid"></div>
   </div>
 </div>
 
 <script>
 const slimes = [
-  {name:"Goopy", img:"images/Goopy.webp", base:3, tier:"Basic", color:"#aaaaaa", atk:4, hp:10, imgSize:"130%", imgBottom:"-10px"},
-  {name:"Sunset", img:"images/Sunset.webp", base:5, tier:"Basic", color:"#aaaaaa", atk:5, hp:15, imgSize:"130%", imgBottom:"-10px"},
-  {name:"Fin", img:"images/Fin.webp", base:8, tier:"Common", color:"#a6ff8b", atk:6, hp:20, imgSize:"130%", imgBottom:"-10px"},
-  {name:"Leafy", img:"images/Leafy.webp", base:11, tier:"Common", color:"#a6ff8b", atk:7, hp:22, imgSize:"130%", imgBottom:"-10px"},
-  {name:"Meow", img:"images/Meow.webp", base:35, tier:"Uncommon", color:"#98f0be", atk:8, hp:27, imgSize:"130%", imgBottom:"-10px"},
-  {name:"Glo", img:"images/Glo.webp", base:57, tier:"Uncommon", color:"#98f0be", atk:10, hp:30, imgSize:"130%", imgBottom:"-10px"},
-  {name:"Buggy", img:"images/Buggy.webp", base:103, tier:"Rare", color:"#85d0fb", atk:13, hp:36, imgSize:"130%", imgBottom:"-10px"},
-  {name:"Scorchy", img:"images/Scorchy.webp", base:160, tier:"Rare", color:"#85d0fb", atk:15, hp:43, imgSize:"130%", imgBottom:"-5px"},
-  {name:"Brutis", img:"images/Brutis.webp", base:263, tier:"Rare", color:"#85d0fb", atk:18, hp:50, imgSize:"130%", imgBottom:"-10px"},
-  {name:"Frankenslime", img:"images/Frankenslime.webp", base:415, tier:"Rare", color:"#85d0fb", atk:20, hp:60, imgSize:"130%", imgBottom:"-10px"},
-  {name:"Orca", img:"images/Orca.webp", base:719, tier:"Epic", color:"#ba85ff", atk:25, hp:72, imgSize:"170%", imgBottom:"-25px"},
-  {name:"Spike", img:"images/Spike.webp", base:1260, tier:"Epic", color:"#ba85ff", atk:29, hp:88, imgSize:"140%", imgBottom:"-10px"},
-  {name:"Axolotl", img:"images/Axolotl.webp", base:2390, tier:"Epic", color:"#ba85ff", atk:36, hp:105, imgSize:"160%", imgBottom:"-20px"},
-  {name:"Spidey", img:"images/Spidey.webp", base:4270, tier:"Legendary", color:"#ffac7b", atk:43, hp:121, imgSize:"155%", imgBottom:"-15px"},
-  {name:"Mushy", img:"images/Mushy.webp", base:7770, tier:"Legendary", color:"#ffac7b", atk:50, hp:148, imgSize:"160%", imgBottom:"-20px"},
-  {name:"Rocky", img:"images/Rocky.webp", base:13900, tier:"Legendary", color:"#ffac7b", atk:58, hp:176, imgSize:"130%", imgBottom:"-10px"},
-  {name:"Lucky", img:"images/Lucky.webp", base:21500, tier:"Mythic", color:"#ff87bf", atk:67, hp:200, imgSize:"130%", imgBottom:"-5px"},
-  {name:"Stump", img:"images/Stump.webp", base:35900, tier:"Mythic", color:"#ff87bf", atk:75, hp:232, imgSize:"130%", imgBottom:"-5px"},
-  {name:"Pondy", img:"images/Pondy.webp", base:53800, tier:"Mythic", color:"#ff87bf", atk:85, hp:256, imgSize:"130%", imgBottom:"-5px"},
-  {name:"Crafty", img:"images/Crafty.webp", base:57400, tier:"Mythic", color:"#ff87bf", atk:90, hp:270, imgSize:"140%", imgBottom:"-10px"},
-  {name:"Icy", img:"images/Icy.webp", base:86100, tier:"Divine", color:"#fee989", atk:96, hp:290, imgSize:"140%", imgBottom:"-15px"},
-  {name:"Orbit", img:"images/Orbit.webp", base:126000, tier:"Divine", color:"#fee989", atk:115, hp:344, imgSize:"160%", imgBottom:"-18px"},
-  {name:"Aegis", img:"images/Aegis.webp", base:215000, tier:"Divine", color:"#fee989", atk:138, hp:414, imgSize:"195%", imgBottom:"-5px"},
-  {name:"Wicked", img:"images/Wicked.webp", base:326000, tier:"Divine", color:"#fee989", atk:166, hp:496, imgSize:"130%", imgBottom:"-5px"},
-  {name:"Thorn", img:"images/Thorn.webp", base:330000, tier:"Divine", color:"#fee989", atk:167, hp:500, imgSize:"140%", imgBottom:"-15px"},
-  {name:"King", img:"images/King.webp", base:538000, tier:"Prismatic", color:"#5dfbcb", atk:189, hp:567, imgSize:"130%", imgBottom:"-5px"},
-  {name:"Guest", img:"images/Guest.webp", base:861000, tier:"Prismatic", color:"#5dfbcb", atk:208, hp:624, imgSize:"130%", imgBottom:"-5px"},
-  {name:"Ninja", img:"images/Ninja.webp", base:1260000, tier:"Prismatic", color:"#5dfbcb", atk:230, hp:690, imgSize:"140%", imgBottom:"-10px"},
-  {name:"Buzz", img:"images/Buzz.webp", base:2150000, tier:"Prismatic", color:"#5dfbcb", atk:270, hp:810, imgSize:"145%", imgBottom:"-15px"},
-  {name:"Stormy", img:"images/Stormy.webp", base:3070000, tier:"Prismatic", color:"#5dfbcb", atk:291, hp:870, imgSize:"180%", imgBottom:"-15px"},
-  {name:"Geode", img:"images/Geode.webp", base:3110000, tier:"Prismatic", color:"#5dfbcb", atk:300, hp:900, imgSize:"170%", imgBottom:"-5px"},
-  {name:"Bucky", img:"images/Bucky.webp", base:4780000, tier:"Transcendent", color:"#e084ff", atk:333, hp:999, imgSize:"170%", imgBottom:"-10px"},
-  {name:"Pokey", img:"images/Pokey.webp", base:7180000, tier:"Transcendent", color:"#e084ff", atk:371, hp:1110, imgSize:"150%", imgBottom:"-15px"},
-  {name:"SlimeSlime", img:"images/SlimeSlime.webp", base:10700000, tier:"Transcendent", color:"#e084ff", atk:419, hp:1250, imgSize:"130%", imgBottom:"-5px"},
-  {name:"Unicorn", img:"images/Unicorn.webp", base:17900000, tier:"Transcendent", color:"#e084ff", atk:508, hp:1520, imgSize:"130%", imgBottom:"-5px"},
-  {name:"Wizzy", img:"images/Wizzy.webp", base:26900000, tier:"Ethereal", color:"#aadeff", atk:612, hp:1830, imgSize:"155%", imgBottom:"-5px"},
-  {name:"Petal", img:"images/Petal.webp", base:39100000, tier:"Ethereal", color:"#aadeff", atk:734, hp:2300, imgSize:"135%", imgBottom:"-10px"},
-  {name:"SlimeSlimeSlime", img:"images/SlimeSlimeSlime.webp", base:42900000, tier:"Ethereal", color:"#aadeff", atk:676, hp:2020, imgSize:"150%", imgBottom:"-5px"},
-  {name:"Shelly", img:"images/Shelly.webp", base:61500000, tier:"Ethereal", color:"#aadeff", atk:880, hp:2640, imgSize:"135%", imgBottom:"-10px"},
-  {name:"Derpy", img:"images/Derpy.webp", base:89700000, tier:"Ethereal", color:"#aadeff", atk:1050, hp:3150, imgSize:"130%", imgBottom:"-5px"},
-  {name:"Octo", img:"images/Octo.webp", base:134000000, tier:"Ethereal", color:"#aadeff", atk:1260, hp:3780, imgSize:"185%", imgBottom:"+5px"},
-  {name:"Puffy", img:"images/Puffy.webp", base:195000000, tier:"Ethereal", color:"#aadeff", atk:1400, hp:4200, imgSize:"130%", imgBottom:"-5px"},
-  {name:"Halo", img:"images/Halo.webp", base:195000000, tier:"Ethereal", color:"#aadeff", atk:1510, hp:4500, imgSize:"130%", imgBottom:"-5px"},
-  {name:"Bomber", img:"images/Bomber.webp", base:307000000, tier:"Secret", color:"#ff4a4a", atk:1810, hp:5430, imgSize:"150%", imgBottom:"-5px"},
-  {name:"UFO", img:"images/UFO.webp", base:478000000, tier:"Secret", color:"#ff4a4a", atk:2170, hp:6510, imgSize:"160%", imgBottom:"-15px"},
-  {name:"Witchy", img:"images/Witchy.webp", base:718000000, tier:"Secret", color:"#ff4a4a", atk:2600, hp:7800, imgSize:"155%", imgBottom:"-5px"},
-  {name:"Blackhole", img:"images/Blackhole.webp", base:1070000000, tier:"Secret", color:"#ff4a4a", atk:3120, hp:9360, imgSize:"160%", imgBottom:"-15px"},
-  {name:"Ember", img:"images/Ember.webp", base:1720000000, tier:"Secret", color:"#ff4a4a", atk:3740, hp:11200, imgSize:"130%", imgBottom:"-5px"},
-  {name:"Astro", img:"images/Astro.webp", base:2470000000, tier:"Secret", color:"#ff4a4a", atk:4100, hp:12300, imgSize:"140%", imgBottom:"-10px"},
-  {name:"Pumpkin", img:"images/Pumpkin.webp", base:2770000000, tier:"Secret", color:"#ff4a4a", atk:4490, hp:13500, imgSize:"130%", imgBottom:"-5px"},
-  {name:"Ouchy", img:"images/Ouchy.webp", base:4390000000, tier:"Celestial", color:"#b6e8ff", atk:5400, hp:16200, imgSize:"190%", imgBottom:"-25px"},
-  {name:"Sharky", img:"images/Sharky.webp", base:6470000000, tier:"Celestial", color:"#b6e8ff", atk:6500, hp:19400, imgSize:"185%", imgBottom:"-25px"},
-  {name:"Dino", img:"images/Dino.webp", base:10100000000, tier:"Celestial", color:"#b6e8ff", atk:7800, hp:23400, imgSize:"150%", imgBottom:"-15px"},
-  {name:"Sunny", img:"images/Sunny.webp", base:11800000000, tier:"Celestial", color:"#b6e8ff", atk:8100, hp:24300, imgSize:"165%", imgBottom:"-22px"},
-  {name:"Monke", img:"images/Monke.webp", base:15300000000, tier:"Celestial", color:"#b6e8ff", atk:9360, hp:28000, imgSize:"170%", imgBottom:"-25px"},
-  {name:"Prickly", img:"images/Prickly.webp", base:23900000000, tier:"Celestial", color:"#b6e8ff", atk:11200, hp:33700, imgSize:"185%", imgBottom:"-30px"},
-  {name:"Zoomy", img:"images/Zoomy.webp", base:34200000000, tier:"Celestial", color:"#b6e8ff", atk:13400, hp:40300, imgSize:"125%", imgBottom:"-8px"},
-  {name:"Waxie", img:"images/Waxie.webp", base:50100000000, tier:"Astral", color:"#4189e0", atk:16100, hp:48200, imgSize:"165%", imgBottom:"-10px"},
-  {name:"Drakey", img:"images/Drakey.webp", base:74300000000, tier:"Astral", color:"#4189e0", atk:19300, hp:58000, imgSize:"190%", imgBottom:"0px"},
-  {name:"Germy", img:"images/Germy.webp", base:133000000000, tier:"Astral", color:"#4189e0", atk:23100, hp:70000, imgSize:"140%", imgBottom:"-17px"},
-  {name:"Palmy", img:"images/Palmy.webp", base:172000000000, tier:"Astral", color:"#4189e0", atk:27700, hp:83000, imgSize:"180%", imgBottom:"-12px"},
-  {name:"Melly", img:"images/Melly.webp", base:237000000000, tier:"Astral", color:"#4189e0", atk:31000, hp:93000, imgSize:"150%", imgBottom:"-15px"},
-  {name:"Snazzy", img:"images/Snazzy.webp", base:269000000000, tier:"Astral", color:"#4189e0", atk:33200, hp:100000, imgSize:"160%", imgBottom:"-20px"},
-  {name:"Bemmy", img:"images/Bemmy.webp", base:414000000000, tier:"Astral", color:"#4189e0", atk:40000, hp:120000, imgSize:"130%", imgBottom:"-15px"},
-  {name:"Mato", img:"images/Mato.webp", base:673000000000, tier:"Nova", color:"#db88d3", atk:48000, hp:144000, imgSize:"125%", imgBottom:"-5px"},
-  {name:"Frosty", img:"images/Frosty.webp", base:1070000000000, tier:"Nova", color:"#db88d3", atk:57600, hp:172000, imgSize:"150%", imgBottom:"-15px"},
-  {name:"Pouchy", img:"images/Pouchy.webp", base:1720000000000, tier:"Nova", color:"#db88d3", atk:70000, hp:210000, imgSize:"150%", imgBottom:"-10px"},
-  {name:"Hoppity", img:"images/Hoppity.webp", base:2690000000000, tier:"Nova", color:"#db88d3", atk:84000, hp:252000, imgSize:"150%", imgBottom:"-15px"},
-  {name:"Sweetie", img:"images/Sweetie.webp", base:3500000000000, tier:"Nova", color:"#db88d3", atk:93000, hp:279000, imgSize:"150%", imgBottom:"-12px"},
-  {name:"Shady", img:"images/Shady.webp", base:3990000000000, tier:"Nova", color:"#db88d3", atk:100000, hp:300000, imgSize:"175%", imgBottom:"0px"},
-  {name:"Galaxy", img:"images/Galaxy.webp", base:6950000000000, tier:"Nova", color:"#db88d3", atk:120000, hp:360000, imgSize:"135%", imgBottom:"-10px"},
-  {name:"Painty", img:"images/Painty.webp", base:11300000000000, tier:"Solar", color:"#d4af37", atk:145000, hp:435000, imgSize:"160%", imgBottom:"-5px"},
-  {name:"Patty", img:"images/Patty.webp", base:18700000000000, tier:"Solar", color:"#d4af37", atk:174000, hp:522000, imgSize:"140%", imgBottom:"-10px"},
-  {name:"Broclee", img:"images/Broclee.webp", base:28700000000000, tier:"Solar", color:"#d4af37", atk:210000, hp:630000, imgSize:"140%", imgBottom:"-5px"},
-  {name:"Meaty", img:"images/Meaty.webp", base:43000000000000, tier:"Solar", color:"#d4af37", atk:256000, hp:777000, imgSize:"145%", imgBottom:"-15px"},
-  {name:"Zappy", img:"images/Zappy.webp", base:67300000000000, tier:"Solar", color:"#d4af37", atk:308000, hp:924000, imgSize:"165%", imgBottom:"-10px"}
+  {name:"Goopy", img:"smiles/Goopy.webp", base:3, tier:"Basic", color:"#aaaaaa", atk:4, hp:10, imgSize:"130%", imgBottom:"-10px"},
+  {name:"Sunset", img:"smiles/Sunset.webp", base:5, tier:"Basic", color:"#aaaaaa", atk:5, hp:15, imgSize:"130%", imgBottom:"-10px"},
+  {name:"Fin", img:"smiles/Fin.webp", base:8, tier:"Common", color:"#a6ff8b", atk:6, hp:20, imgSize:"130%", imgBottom:"-10px"},
+  {name:"Leafy", img:"smiles/Leafy.webp", base:11, tier:"Common", color:"#a6ff8b", atk:7, hp:22, imgSize:"130%", imgBottom:"-10px"},
+  {name:"Meow", img:"smiles/Meow.webp", base:35, tier:"Uncommon", color:"#98f0be", atk:8, hp:27, imgSize:"130%", imgBottom:"-10px"},
+  {name:"Glo", img:"smiles/Glo.webp", base:57, tier:"Uncommon", color:"#98f0be", atk:10, hp:30, imgSize:"130%", imgBottom:"-10px"},
+  {name:"Buggy", img:"smiles/Buggy.webp", base:103, tier:"Rare", color:"#85d0fb", atk:13, hp:36, imgSize:"130%", imgBottom:"-10px"},
+  {name:"Scorchy", img:"smiles/Scorchy.webp", base:160, tier:"Rare", color:"#85d0fb", atk:15, hp:43, imgSize:"130%", imgBottom:"-5px"},
+  {name:"Brutis", img:"smiles/Brutis.webp", base:263, tier:"Rare", color:"#85d0fb", atk:18, hp:50, imgSize:"130%", imgBottom:"-10px"},
+  {name:"Frankenslime", img:"smiles/Frankenslime.webp", base:415, tier:"Rare", color:"#85d0fb", atk:20, hp:60, imgSize:"130%", imgBottom:"-10px"},
+  {name:"Orca", img:"smiles/Orca.webp", base:719, tier:"Epic", color:"#ba85ff", atk:25, hp:72, imgSize:"170%", imgBottom:"-25px"},
+  {name:"Spike", img:"smiles/Spike.webp", base:1260, tier:"Epic", color:"#ba85ff", atk:29, hp:88, imgSize:"140%", imgBottom:"-10px"},
+  {name:"Axolotl", img:"smiles/Axolotl.webp", base:2390, tier:"Epic", color:"#ba85ff", atk:36, hp:105, imgSize:"160%", imgBottom:"-20px"},
+  {name:"Spidey", img:"smiles/Spidey.webp", base:4270, tier:"Legendary", color:"#ffac7b", atk:43, hp:121, imgSize:"155%", imgBottom:"-15px"},
+  {name:"Mushy", img:"smiles/Mushy.webp", base:7770, tier:"Legendary", color:"#ffac7b", atk:50, hp:148, imgSize:"160%", imgBottom:"-20px"},
+  {name:"Rocky", img:"smiles/Rocky.webp", base:13900, tier:"Legendary", color:"#ffac7b", atk:58, hp:176, imgSize:"130%", imgBottom:"-10px"},
+  {name:"Lucky", img:"smiles/Lucky.webp", base:21500, tier:"Mythic", color:"#ff87bf", atk:67, hp:200, imgSize:"130%", imgBottom:"-5px"},
+  {name:"Stump", img:"smiles/Stump.webp", base:35900, tier:"Mythic", color:"#ff87bf", atk:75, hp:232, imgSize:"130%", imgBottom:"-5px"},
+  {name:"Pondy", img:"smiles/Pondy.webp", base:53800, tier:"Mythic", color:"#ff87bf", atk:85, hp:256, imgSize:"130%", imgBottom:"-5px"},
+  {name:"Crafty", img:"smiles/Crafty.webp", base:57400, tier:"Mythic", color:"#ff87bf", atk:90, hp:270, imgSize:"140%", imgBottom:"-10px"},
+  {name:"Icy", img:"smiles/Icy.webp", base:86100, tier:"Divine", color:"#fee989", atk:96, hp:290, imgSize:"140%", imgBottom:"-15px"},
+  {name:"Orbit", img:"smiles/Orbit.webp", base:126000, tier:"Divine", color:"#fee989", atk:115, hp:344, imgSize:"160%", imgBottom:"-18px"},
+  {name:"Aegis", img:"smiles/Aegis.webp", base:215000, tier:"Divine", color:"#fee989", atk:138, hp:414, imgSize:"195%", imgBottom:"-5px"},
+  {name:"Wicked", img:"smiles/Wicked.webp", base:326000, tier:"Divine", color:"#fee989", atk:166, hp:496, imgSize:"130%", imgBottom:"-5px"},
+  {name:"Thorn", img:"smiles/Thorn.webp", base:330000, tier:"Divine", color:"#fee989", atk:167, hp:500, imgSize:"140%", imgBottom:"-15px"},
+  {name:"King", img:"smiles/King.webp", base:538000, tier:"Prismatic", color:"#5dfbcb", atk:189, hp:567, imgSize:"130%", imgBottom:"-5px"},
+  {name:"Guest", img:"smiles/Guest.webp", base:861000, tier:"Prismatic", color:"#5dfbcb", atk:208, hp:624, imgSize:"130%", imgBottom:"-5px"},
+  {name:"Ninja", img:"smiles/Ninja.webp", base:1260000, tier:"Prismatic", color:"#5dfbcb", atk:230, hp:690, imgSize:"140%", imgBottom:"-10px"},
+  {name:"Buzz", img:"smiles/Buzz.webp", base:2150000, tier:"Prismatic", color:"#5dfbcb", atk:270, hp:810, imgSize:"145%", imgBottom:"-15px"},
+  {name:"Stormy", img:"smiles/Stormy.webp", base:3070000, tier:"Prismatic", color:"#5dfbcb", atk:291, hp:870, imgSize:"180%", imgBottom:"-15px"},
+  {name:"Geode", img:"smiles/Geode.webp", base:3110000, tier:"Prismatic", color:"#5dfbcb", atk:300, hp:900, imgSize:"170%", imgBottom:"-5px"},
+  {name:"Bucky", img:"smiles/Bucky.webp", base:4780000, tier:"Transcendent", color:"#e084ff", atk:333, hp:999, imgSize:"170%", imgBottom:"-10px"},
+  {name:"Pokey", img:"smiles/Pokey.webp", base:7180000, tier:"Transcendent", color:"#e084ff", atk:371, hp:1110, imgSize:"150%", imgBottom:"-15px"},
+  {name:"SlimeSlime", img:"smiles/SlimeSlime.webp", base:10700000, tier:"Transcendent", color:"#e084ff", atk:419, hp:1250, imgSize:"130%", imgBottom:"-5px"},
+  {name:"Unicorn", img:"smiles/Unicorn.webp", base:17900000, tier:"Transcendent", color:"#e084ff", atk:508, hp:1520, imgSize:"130%", imgBottom:"-5px"},
+  {name:"Wizzy", img:"smiles/Wizzy.webp", base:26900000, tier:"Ethereal", color:"#aadeff", atk:612, hp:1830, imgSize:"155%", imgBottom:"-5px"},
+  {name:"Petal", img:"smiles/Petal.webp", base:39100000, tier:"Ethereal", color:"#aadeff", atk:734, hp:2300, imgSize:"135%", imgBottom:"-10px"},
+  {name:"SlimeSlimeSlime", img:"smiles/SlimeSlimeSlime.webp", base:42900000, tier:"Ethereal", color:"#aadeff", atk:676, hp:2020, imgSize:"150%", imgBottom:"-5px"},
+  {name:"Shelly", img:"smiles/Shelly.webp", base:61500000, tier:"Ethereal", color:"#aadeff", atk:880, hp:2640, imgSize:"135%", imgBottom:"-10px"},
+  {name:"Derpy", img:"smiles/Derpy.webp", base:89700000, tier:"Ethereal", color:"#aadeff", atk:1050, hp:3150, imgSize:"130%", imgBottom:"-5px"},
+  {name:"Octo", img:"smiles/Octo.webp", base:134000000, tier:"Ethereal", color:"#aadeff", atk:1260, hp:3780, imgSize:"185%", imgBottom:"+5px"},
+  {name:"Puffy", img:"smiles/Puffy.webp", base:195000000, tier:"Ethereal", color:"#aadeff", atk:1400, hp:4200, imgSize:"130%", imgBottom:"-5px"},
+  {name:"Halo", img:"smiles/Halo.webp", base:195000000, tier:"Ethereal", color:"#aadeff", atk:1510, hp:4500, imgSize:"130%", imgBottom:"-5px"},
+  {name:"Bomber", img:"smiles/Bomber.webp", base:307000000, tier:"Secret", color:"#ff4a4a", atk:1810, hp:5430, imgSize:"150%", imgBottom:"-5px"},
+  {name:"UFO", img:"smiles/UFO.webp", base:478000000, tier:"Secret", color:"#ff4a4a", atk:2170, hp:6510, imgSize:"160%", imgBottom:"-15px"},
+  {name:"Witchy", img:"smiles/Witchy.webp", base:718000000, tier:"Secret", color:"#ff4a4a", atk:2600, hp:7800, imgSize:"155%", imgBottom:"-5px"},
+  {name:"Blackhole", img:"smiles/Blackhole.webp", base:1070000000, tier:"Secret", color:"#ff4a4a", atk:3120, hp:9360, imgSize:"160%", imgBottom:"-15px"},
+  {name:"Ember", img:"smiles/Ember.webp", base:1720000000, tier:"Secret", color:"#ff4a4a", atk:3740, hp:11200, imgSize:"130%", imgBottom:"-5px"},
+  {name:"Astro", img:"smiles/Astro.webp", base:2470000000, tier:"Secret", color:"#ff4a4a", atk:4100, hp:12300, imgSize:"140%", imgBottom:"-10px"},
+  {name:"Pumpkin", img:"smiles/Pumpkin.webp", base:2770000000, tier:"Secret", color:"#ff4a4a", atk:4490, hp:13500, imgSize:"130%", imgBottom:"-5px"},
+  {name:"Ouchy", img:"smiles/Ouchy.webp", base:4390000000, tier:"Celestial", color:"#b6e8ff", atk:5400, hp:16200, imgSize:"190%", imgBottom:"-25px"},
+  {name:"Sharky", img:"smiles/Sharky.webp", base:6470000000, tier:"Celestial", color:"#b6e8ff", atk:6500, hp:19400, imgSize:"185%", imgBottom:"-25px"},
+  {name:"Dino", img:"smiles/Dino.webp", base:10100000000, tier:"Celestial", color:"#b6e8ff", atk:7800, hp:23400, imgSize:"150%", imgBottom:"-15px"},
+  {name:"Sunny", img:"smiles/Sunny.webp", base:11800000000, tier:"Celestial", color:"#b6e8ff", atk:8100, hp:24300, imgSize:"165%", imgBottom:"-22px"},
+  {name:"Monke", img:"smiles/Monke.webp", base:15300000000, tier:"Celestial", color:"#b6e8ff", atk:9360, hp:28000, imgSize:"170%", imgBottom:"-25px"},
+  {name:"Prickly", img:"smiles/Prickly.webp", base:23900000000, tier:"Celestial", color:"#b6e8ff", atk:11200, hp:33700, imgSize:"185%", imgBottom:"-30px"},
+  {name:"Zoomy", img:"smiles/Zoomy.webp", base:34200000000, tier:"Celestial", color:"#b6e8ff", atk:13400, hp:40300, imgSize:"125%", imgBottom:"-8px"},
+  {name:"Waxie", img:"smiles/Waxie.webp", base:50100000000, tier:"Astral", color:"#4189e0", atk:16100, hp:48200, imgSize:"165%", imgBottom:"-10px"},
+  {name:"Drakey", img:"smiles/Drakey.webp", base:74300000000, tier:"Astral", color:"#4189e0", atk:19300, hp:58000, imgSize:"190%", imgBottom:"0px"},
+  {name:"Germy", img:"smiles/Germy.webp", base:133000000000, tier:"Astral", color:"#4189e0", atk:23100, hp:70000, imgSize:"140%", imgBottom:"-17px"},
+  {name:"Palmy", img:"smiles/Palmy.webp", base:172000000000, tier:"Astral", color:"#4189e0", atk:27700, hp:83000, imgSize:"180%", imgBottom:"-12px"},
+  {name:"Melly", img:"smiles/Melly.webp", base:237000000000, tier:"Astral", color:"#4189e0", atk:31000, hp:93000, imgSize:"150%", imgBottom:"-15px"},
+  {name:"Snazzy", img:"smiles/Snazzy.webp", base:269000000000, tier:"Astral", color:"#4189e0", atk:33200, hp:100000, imgSize:"160%", imgBottom:"-20px"},
+  {name:"Bemmy", img:"smiles/Bemmy.webp", base:414000000000, tier:"Astral", color:"#4189e0", atk:40000, hp:120000, imgSize:"130%", imgBottom:"-15px"},
+  {name:"Mato", img:"smiles/Mato.webp", base:673000000000, tier:"Nova", color:"#db88d3", atk:48000, hp:144000, imgSize:"125%", imgBottom:"-5px"},
+  {name:"Frosty", img:"smiles/Frosty.webp", base:1070000000000, tier:"Nova", color:"#db88d3", atk:57600, hp:172000, imgSize:"150%", imgBottom:"-15px"},
+  {name:"Pouchy", img:"smiles/Pouchy.webp", base:1720000000000, tier:"Nova", color:"#db88d3", atk:70000, hp:210000, imgSize:"150%", imgBottom:"-10px"},
+  {name:"Hoppity", img:"smiles/Hoppity.webp", base:2690000000000, tier:"Nova", color:"#db88d3", atk:84000, hp:252000, imgSize:"150%", imgBottom:"-15px"},
+  {name:"Sweetie", img:"smiles/Sweetie.webp", base:3500000000000, tier:"Nova", color:"#db88d3", atk:93000, hp:279000, imgSize:"150%", imgBottom:"-12px"},
+  {name:"Shady", img:"smiles/Shady.webp", base:3990000000000, tier:"Nova", color:"#db88d3", atk:100000, hp:300000, imgSize:"175%", imgBottom:"0px"},
+  {name:"Galaxy", img:"smiles/Galaxy.webp", base:6950000000000, tier:"Nova", color:"#db88d3", atk:120000, hp:360000, imgSize:"135%", imgBottom:"-10px"},
+  {name:"Painty", img:"smiles/Painty.webp", base:11300000000000, tier:"Solar", color:"#d4af37", atk:145000, hp:435000, imgSize:"160%", imgBottom:"-5px"},
+  {name:"Patty", img:"smiles/Patty.webp", base:18700000000000, tier:"Solar", color:"#d4af37", atk:174000, hp:522000, imgSize:"140%", imgBottom:"-10px"},
+  {name:"Broclee", img:"smiles/Broclee.webp", base:28700000000000, tier:"Solar", color:"#d4af37", atk:210000, hp:630000, imgSize:"140%", imgBottom:"-5px"},
+  {name:"Meaty", img:"smiles/Meaty.webp", base:43000000000000, tier:"Solar", color:"#d4af37", atk:256000, hp:777000, imgSize:"145%", imgBottom:"-15px"},
+  {name:"Zappy", img:"smiles/Zappy.webp", base:67300000000000, tier:"Solar", color:"#d4af37", atk:308000, hp:924000, imgSize:"165%", imgBottom:"-10px"}
 ];
 
 const mutations = [
@@ -461,6 +484,19 @@ const statMultipliers = {
   'big+shiny':24,'huge+shiny':60,
   'big+inverted+shiny':312,'huge+inverted+shiny':780,
 };
+
+// Харчування: арифметична прогресія з кроком 25
+const foodTypes = [
+  { name: 'Cheese', hp: 75, img: 'others/Cheese.png' },
+  { name: 'Egg', hp: 100, img: 'others/Egg.png' },
+  { name: 'Fries', hp: 125, img: 'others/Fries.png' },
+  { name: 'Taco', hp: 150, img: 'others/Taco.png' },
+  { name: 'Hotdog', hp: 175, img: 'others/Hotdog.png' },
+  { name: 'Burger', hp: 200, img: 'others/Burger.png' },
+  { name: 'Pizza', hp: 225, img: 'others/Pizza.png' },
+  { name: 'Chicken', hp: 250, img: 'others/Chicken.png' },
+  { name: 'Drumstick', hp: 275, img: 'others/Drumstick.png' }
+];
 
 let selectedSlime = null, currentLevel = 1;
 const selectedMuts = new Set();
@@ -509,13 +545,16 @@ function syncLevel() {
 }
 
 function toggleFaq() {
-  const modal = document.getElementById('faq-modal');
-  modal.classList.toggle('active');
+  document.getElementById('faq-modal').classList.toggle('active');
 }
 
-function closeFaq(e) {
-  if (e.target.id === 'faq-modal') {
-    toggleFaq();
+function toggleFoodModal() {
+  document.getElementById('food-modal').classList.toggle('active');
+}
+
+function closeModal(e, modalId) {
+  if (e.target.id === modalId) {
+    document.getElementById(modalId).classList.remove('active');
   }
 }
 
@@ -760,6 +799,33 @@ function renderFavorites() {
   });
 }
 
+function renderFoodModal(totalHp) {
+  const grid = document.getElementById('food-grid');
+  const modalTitle = document.getElementById('food-modal-title');
+  grid.innerHTML = '';
+
+  if (totalHp === 0) {
+    modalTitle.innerHTML = 'Food Needed 🍔';
+    grid.innerHTML = '<p style="color:#a0a0c0; grid-column: 1/-1; text-align: center; padding: 1rem 0;">No food needed for Level 1.</p>';
+    return;
+  }
+
+  // Оновлюємо заголовок
+  modalTitle.innerHTML = `Food Needed for level ${currentLevel} <span style="font-size: 15px; color: #a0a0c0; font-weight: 600;">(${fmtNum(totalHp)} HP)</span>`;
+
+  foodTypes.forEach(food => {
+    const requiredQty = Math.ceil(totalHp / food.hp);
+    
+    grid.innerHTML += `
+      <div class="food-card">
+        <img src="${food.img}" alt="${food.name}" class="food-img" onerror="this.src='images/icon.webp'">
+        <div class="food-name">${food.name}</div>
+        <div class="food-qty">${fmtNum(requiredQty)}</div>
+      </div>
+    `;
+  });
+}
+
 function update() {
   const slime = slimes.find(s => s.name === selectedSlime);
   const sorted = [...selectedMuts].sort();
@@ -782,7 +848,10 @@ function update() {
   else document.body.classList.remove('mutation-shiny-active');
 
   if (!slime) {
-    ['sel-slime','base-rarity','rarity-value','stat-atk','stat-hp'].forEach(id => document.getElementById(id).textContent = '—');
+    ['sel-slime','base-rarity','rarity-value','stat-atk','stat-hp','upgrade-cost'].forEach(id => {
+      const el = document.getElementById(id);
+      if(el) el.textContent = '—';
+    });
     document.getElementById('stat-multi').textContent = 'x1';
     
     document.getElementById('rarity-value').style.color = '#e8e8f0';
@@ -848,6 +917,23 @@ function update() {
   document.getElementById('stat-atk').textContent = fmtNum(atk);
   document.getElementById('stat-hp').textContent = fmtNum(hp);
   document.getElementById('stat-multi').textContent = 'x' + statMult;
+
+  // Рахуємо сумарне HP для обраного рівня
+  const totalEggs = (currentLevel - 1) * currentLevel / 2;
+  const totalHp = totalEggs * 100;
+  
+  if (totalHp === 0) {
+    document.getElementById('upgrade-cost').textContent = '0 HP';
+  } else {
+    // Вставляємо значення HP та кнопку (*)
+    document.getElementById('upgrade-cost').innerHTML = `
+      ${fmtNum(totalHp)} HP 
+      <button class="food-trigger-btn" onclick="toggleFoodModal()">*Food</button>
+    `;
+  }
+  
+  // Оновлюємо модалку з розрахунками їжі
+  renderFoodModal(totalHp);
 
   if (presetMatch) {
     document.getElementById('combo-hint').style.display = 'block';
