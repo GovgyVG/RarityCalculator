@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Slime Rarity Calculator</title>
-<!-- Підключення іконки (favicon) -->
 <link rel="icon" type="image/png" href="others/icon.webp">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -65,7 +64,6 @@
     border-radius: 8px; position: relative;
   }
 
-  /* === ПУСТИЙ ТА ЗАПОВНЕНИЙ СТАН ОБРАНОГО СЛАЙМА === */
   #res-slime-wrapper {
     width: 60px; height: 60px; border-radius: 8px; margin: 0;
     position: relative; display: flex; align-items: flex-end; justify-content: center;
@@ -82,7 +80,6 @@
   #res-slime-img { display: none; }
   #res-slime-wrapper.has-slime #res-slime-img { display: block; }
 
-  /* === ВІЗУАЛЬНІ ЕФЕКТИ МУТАЦІЙ === */
   .mutation-big-active #res-slime-wrapper,
   .mutation-big-active #slime-grid .slime-img-wrapper {
     border-radius: 0 !important; border: 3px solid #0a0a0a !important; overflow: hidden !important; background: #201e30;
@@ -113,7 +110,6 @@
   .mutation-shiny-active #res-slime-wrapper .shiny-overlay,
   .mutation-shiny-active #slime-grid .shiny-overlay { display: block; }
 
-  /* === ФАВОРИТИ (Стилі) === */
   #favorites-wrapper { margin-bottom: 1.5rem; display: none; }
   .fav-container { display: flex; flex-wrap: wrap; gap: 10px; }
   
@@ -169,7 +165,6 @@
   .stat-group { display: flex; align-items: center; gap: 12px; }
   .slime-name { font-size: 13px; font-weight: 600; color: #e8e8f0; display: block; margin-bottom: 4px; }
   
-  /* ОБВОДКА ШАНСУ */
   .slime-tier, .fav-tier {
     font-size: 13px; display: block; font-weight: 800; margin-top: 2px; letter-spacing: 0.5px;
     text-shadow: 
@@ -210,7 +205,6 @@
   }
   .food-trigger-btn:hover { background: #4a4070; color: #fff; }
   
-  /* ОБВОДКА ГОЛОВНОГО ШАНСУ */
   #rarity-value { 
     font-size: 36px; font-weight: 900; color: #e8e8f0; margin: 0 0 4px; min-height: 44px; letter-spacing: 0.5px;
     text-shadow: 
@@ -234,7 +228,6 @@
   .combo-sub { font-size: 11px; color: #5a5580; margin: 0 0 3px; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
   .combo-name-text { font-size: 14px; font-weight: 600; margin: 0; color: #c0b8e8; }
 
-  /* === MODAL STYLES === */
   .modal-overlay {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(0, 0, 0, 0.7); z-index: 100;
@@ -257,13 +250,7 @@
     border-radius: 8px; transition: 0.2s;
   }
   .modal-close:hover { background: #2a2540; color: #e8e8f0; }
-  
-  .faq-list { display: flex; flex-direction: column; gap: 1.25rem; margin-top: 1.5rem; }
-  .faq-item { background: #13121a; padding: 1.25rem; border-radius: 10px; border: 1px solid #2a2540; }
-  .faq-q { font-weight: 700; color: #d0c8f0; margin-bottom: 0.5rem; font-size: 15px; }
-  .faq-a { color: #a0a0c0; font-size: 14px; line-height: 1.6; }
 
-  /* === FOOD MODAL GRID === */
   .food-grid {
     display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; margin-top: 1.5rem;
   }
@@ -283,7 +270,6 @@
       <span class="title">Rarity Calculator</span>
     </div>
     <div class="header-right">
-      <button class="reset-btn" onclick="toggleFaq()">FAQ</button>
       <button class="reset-btn" onclick="resetAll()">Reset</button>
     </div>
   </div>
@@ -352,30 +338,6 @@
   </div>
 </div>
 
-<!-- FAQ Modal -->
-<div class="modal-overlay" id="faq-modal" onclick="closeModal(event, 'faq-modal')">
-  <div class="modal-content" onclick="event.stopPropagation()">
-    <button class="modal-close" onclick="toggleFaq()">✕</button>
-    <h2 class="title" style="font-size: 22px;">FAQ & Guide</h2>
-    
-    <div class="faq-list">
-      <div class="faq-item">
-        <div class="faq-q">What is this calculator for?</div>
-        <div class="faq-a">This tool helps you accurately calculate the final rarity, ATK, and HP of your slimes based on their base rarity, current level, and active mutations.</div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-q">How do mutations work?</div>
-        <div class="faq-a">Each mutation multiplies your slime's rarity and stats. By combining specific mutations (like Shiny + Big), you can trigger "Presets" which offer massively increased multipliers compared to separate mutations.</div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-q">Why can't I select some mutations together?</div>
-        <div class="faq-a">Certain mutations are mutually exclusive and cannot exist on the same slime at once. For example, a slime cannot be both <b>Big</b> and <b>Huge</b> simultaneously.</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Food Requirements Modal -->
 <div class="modal-overlay" id="food-modal" onclick="closeModal(event, 'food-modal')">
   <div class="modal-content" onclick="event.stopPropagation()">
     <button class="modal-close" onclick="toggleFoodModal()">✕</button>
@@ -485,7 +447,6 @@ const statMultipliers = {
   'big+inverted+shiny':312,'huge+inverted+shiny':780,
 };
 
-// Харчування: арифметична прогресія з кроком 25
 const foodTypes = [
   { name: 'Cheese', hp: 75, img: 'others/Cheese.png' },
   { name: 'Egg', hp: 100, img: 'others/Egg.png' },
@@ -542,10 +503,6 @@ function fmt(n) { return '1/' + fmtNum(n); }
 function syncLevel() {
   currentLevel = Math.max(1, parseInt(document.getElementById('level-num').value) || 1);
   update();
-}
-
-function toggleFaq() {
-  document.getElementById('faq-modal').classList.toggle('active');
 }
 
 function toggleFoodModal() {
@@ -810,7 +767,6 @@ function renderFoodModal(totalHp) {
     return;
   }
 
-  // Оновлюємо заголовок
   modalTitle.innerHTML = `Food Needed for level ${currentLevel} <span style="font-size: 15px; color: #a0a0c0; font-weight: 600;">(${fmtNum(totalHp)} HP)</span>`;
 
   foodTypes.forEach(food => {
@@ -918,21 +874,18 @@ function update() {
   document.getElementById('stat-hp').textContent = fmtNum(hp);
   document.getElementById('stat-multi').textContent = 'x' + statMult;
 
-  // Рахуємо сумарне HP для обраного рівня
   const totalEggs = (currentLevel - 1) * currentLevel / 2;
   const totalHp = totalEggs * 100;
   
   if (totalHp === 0) {
     document.getElementById('upgrade-cost').textContent = '0 HP';
   } else {
-    // Вставляємо значення HP та кнопку (*)
     document.getElementById('upgrade-cost').innerHTML = `
       ${fmtNum(totalHp)} HP 
       <button class="food-trigger-btn" onclick="toggleFoodModal()">*Food</button>
     `;
   }
   
-  // Оновлюємо модалку з розрахунками їжі
   renderFoodModal(totalHp);
 
   if (presetMatch) {
